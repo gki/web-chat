@@ -34,6 +34,7 @@ describe('UserLogin Integration Tests', () => {
             },
           },
         },
+        delay: 100, // Add delay to allow loading state to be visible
       },
     ];
 

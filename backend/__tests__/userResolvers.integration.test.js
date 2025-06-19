@@ -89,8 +89,8 @@ describe('User Resolvers Integration Tests', () => {
         .expect(200);
 
       expect(response.body.errors).toBeDefined();
-      expect(response.body.errors[0].message).toContain('Name cannot be empty');
-      expect(response.body.data.createUser).toBeNull();
+      expect(response.body.errors[0].message).toContain('Name is required and must be a string');
+      expect(response.body.data?.createUser || null).toBeNull();
 
       // Verify no user was created in database
       const userCount = await global.testDb.user.count();

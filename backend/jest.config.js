@@ -8,4 +8,7 @@ module.exports = {
   ],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testTimeout: 30000,
+  // Run tests sequentially to prevent database locking
+  maxWorkers: 1,
+  maxConcurrency: 1,
 };

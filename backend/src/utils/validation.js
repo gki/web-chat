@@ -18,7 +18,7 @@ const validateUserName = (name) => {
 };
 
 const validateMessageContent = (content) => {
-  if (!content || typeof content !== 'string') {
+  if (typeof content !== 'string') {
     throw new UserInputError('Message content is required and must be a string');
   }
   
