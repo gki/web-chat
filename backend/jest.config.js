@@ -16,7 +16,9 @@ module.exports = {
   maxWorkers: 1,
   maxConcurrency: 1,
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: '<rootDir>/tsconfig.json'
+    }],
     '^.+\\.js$': 'babel-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'json'],

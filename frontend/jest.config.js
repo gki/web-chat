@@ -16,7 +16,11 @@ module.exports = {
     '!src/setupTests.{js,ts}',
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: {
+        jsx: 'react-jsx',
+      },
+    }],
     '^.+\\.(js|jsx)$': ['babel-jest', {
       presets: [
         ['@babel/preset-env', { targets: { node: 'current' } }],
@@ -26,11 +30,4 @@ module.exports = {
     }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  globals: {
-    'ts-jest': {
-      tsconfig: {
-        jsx: 'react-jsx',
-      },
-    },
-  },
 };
