@@ -1,11 +1,12 @@
-const { PubSub } = require('graphql-subscriptions');
-const { validateMessageContent } = require('../utils/validation');
+import { PubSub } from 'graphql-subscriptions';
+import { validateMessageContent } from '../utils/validation';
+import { GraphQLContext } from '../types/context';
 
 const pubsub = new PubSub();
 
-const messageResolvers = {
+export const messageResolvers = {
   Query: {
-    messages: async (parent, args, { prisma }) => {
+    messages: async (parent, args, { prisma }: GraphQLContext) => {
       return await prisma.message.findMany({
         orderBy: { createdAt: 'asc' },
         include: { user: true },
@@ -14,7 +15,7 @@ const messageResolvers = {
   },
 
   Mutation: {
-    createMessage: async (parent, { content, userId }, { prisma }) => {
+    createMessage: async (parent, { content, userId }, { prisma }: GraphQLContext) => {
       const validatedContent = validateMessageContent(content);
       
       const message = await prisma.message.create({
@@ -43,12 +44,10 @@ const messageResolvers = {
   },
 
   Message: {
-    user: async (parent, args, { prisma }) => {
+    user: async (parent: any, args, { prisma }: GraphQLContext) => {
       return await prisma.user.findUnique({
         where: { id: parent.userId },
       });
     },
   },
 };
-
-module.exports = messageResolvers;

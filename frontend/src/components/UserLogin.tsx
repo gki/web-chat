@@ -9,8 +9,13 @@ import {
 import { useMutation } from '@apollo/client';
 
 import { CREATE_USER } from '../apollo/queries';
+import { User } from '../types/user';
 
-function UserLogin({ onLogin }) {
+interface UserLoginProps {
+  onLogin: (user: User) => void;
+}
+
+function UserLogin({ onLogin }: UserLoginProps) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
 

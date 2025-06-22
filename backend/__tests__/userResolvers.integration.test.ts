@@ -3,8 +3,8 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 
-const typeDefs = require('../src/schema/typeDefs');
-const resolvers = require('../src/resolvers');
+const { typeDefs } = require('../src/schema/typeDefs');
+const { resolvers } = require('../src/resolvers');
 
 describe('User Resolvers Integration Tests', () => {
   let app;

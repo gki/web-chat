@@ -21,8 +21,14 @@ import {
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import UserList from './UserList';
+import { User } from '../types/user';
 
-function ChatRoom({ currentUser, onLogout }) {
+interface ChatRoomProps {
+  currentUser: User;
+  onLogout: () => void;
+}
+
+function ChatRoom({ currentUser, onLogout }: ChatRoomProps) {
   const client = useApolloClient();
   const [updateUserLastSeen] = useMutation(UPDATE_USER_LAST_SEEN);
 

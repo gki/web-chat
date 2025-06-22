@@ -3,8 +3,8 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 
-const typeDefs = require('../src/schema/typeDefs');
-const resolvers = require('../src/resolvers');
+const { typeDefs: messageTestTypeDefs } = require('../src/schema/typeDefs');
+const { resolvers: messageTestResolvers } = require('../src/resolvers');
 
 describe('Message Resolvers Integration Tests', () => {
   let app;
@@ -13,8 +13,8 @@ describe('Message Resolvers Integration Tests', () => {
 
   beforeEach(async () => {
     const schema = makeExecutableSchema({
-      typeDefs,
-      resolvers,
+      typeDefs: messageTestTypeDefs,
+      resolvers: messageTestResolvers,
     });
 
     server = new ApolloServer({

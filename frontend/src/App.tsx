@@ -8,11 +8,12 @@ import {
 
 import UserLogin from './components/UserLogin';
 import ChatRoom from './components/ChatRoom';
+import { User } from './types/user';
 
 function App() {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  const handleUserLogin = (user) => {
+  const handleUserLogin = (user: User) => {
     setCurrentUser(user);
   };
 

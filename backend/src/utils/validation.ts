@@ -1,6 +1,6 @@
-const { UserInputError } = require('apollo-server-express');
+import { UserInputError } from 'apollo-server-express';
 
-const validateUserName = (name) => {
+export const validateUserName = (name: unknown): string => {
   if (!name || typeof name !== 'string') {
     throw new UserInputError('Name is required and must be a string');
   }
@@ -17,7 +17,7 @@ const validateUserName = (name) => {
   return trimmedName;
 };
 
-const validateMessageContent = (content) => {
+export const validateMessageContent = (content: unknown): string => {
   if (typeof content !== 'string') {
     throw new UserInputError('Message content is required and must be a string');
   }
@@ -32,9 +32,4 @@ const validateMessageContent = (content) => {
   }
   
   return trimmedContent;
-};
-
-module.exports = {
-  validateUserName,
-  validateMessageContent,
 };

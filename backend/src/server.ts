@@ -1,18 +1,21 @@
-const express = require('express');
-const { ApolloServer } = require('apollo-server-express');
-const { createServer } = require('http');
-const { SubscriptionServer } = require('subscriptions-transport-ws');
-const { execute, subscribe } = require('graphql');
-const { makeExecutableSchema } = require('@graphql-tools/schema');
-const { PrismaClient } = require('@prisma/client');
-require('dotenv').config();
+import express from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import { createServer } from 'http';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { execute, subscribe } from 'graphql';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { PrismaClient } from '@prisma/client';
+import * as dotenv from 'dotenv';
+import { GraphQLContext } from './types/context';
 
-const typeDefs = require('./schema/typeDefs');
-const resolvers = require('./resolvers');
+import { typeDefs } from './schema/typeDefs';
+import { resolvers } from './resolvers';
 
-const prisma = new PrismaClient();
+dotenv.config();
 
-async function startServer() {
+export const prisma = new PrismaClient();
+
+export async function startServer() {
   const app = express();
   
   const schema = makeExecutableSchema({
@@ -22,9 +25,8 @@ async function startServer() {
 
   const server = new ApolloServer({
     schema,
-    context: ({ req }) => ({
+    context: ({ req }): GraphQLContext => ({
       prisma,
-      req,
     }),
     plugins: [
       {
@@ -49,11 +51,11 @@ async function startServer() {
       schema,
       execute,
       subscribe,
-      onConnect: (connectionParams, webSocket, context) => {
+      onConnect: () => {
         console.log('Client connected for subscriptions');
         return { prisma };
       },
-      onDisconnect: (webSocket, context) => {
+      onDisconnect: () => {
         console.log('Client disconnected from subscriptions');
       },
     },
@@ -80,5 +82,3 @@ if (require.main === module) {
     process.exit(1);
   });
 }
-
-module.exports = { startServer, prisma };

@@ -9,8 +9,14 @@ import { Send } from '@mui/icons-material';
 import { useMutation } from '@apollo/client';
 
 import { CREATE_MESSAGE } from '../apollo/queries';
+import { User } from '../types/user';
 
-function MessageInput({ currentUser, onMessageSent }) {
+interface MessageInputProps {
+  currentUser: User;
+  onMessageSent: () => void;
+}
+
+function MessageInput({ currentUser, onMessageSent }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -25,7 +31,7 @@ function MessageInput({ currentUser, onMessageSent }) {
     },
   });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!message.trim()) {
@@ -45,10 +51,10 @@ function MessageInput({ currentUser, onMessageSent }) {
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      handleSubmit(e as any);
     }
   };
 
