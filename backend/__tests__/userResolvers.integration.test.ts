@@ -1,10 +1,10 @@
-const request = require('supertest');
-const express = require('express');
-const { ApolloServer } = require('apollo-server-express');
-const { makeExecutableSchema } = require('@graphql-tools/schema');
+import request from 'supertest';
+import express from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 
-const { typeDefs } = require('../src/schema/typeDefs');
-const { resolvers } = require('../src/resolvers');
+import { typeDefs } from '../src/schema/typeDefs';
+import { resolvers } from '../src/resolvers';
 
 describe('User Resolvers Integration Tests', () => {
   let app;

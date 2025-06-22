@@ -1,5 +1,5 @@
 // Basic backend tests
-const { validateUserName, validateMessageContent } = require('../src/utils/validation');
+import { validateUserName, validateMessageContent } from '../src/utils/validation';
 
 describe('Validation Functions', () => {
   describe('validateUserName', () => {
