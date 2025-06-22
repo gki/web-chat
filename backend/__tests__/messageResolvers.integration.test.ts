@@ -1,5 +1,5 @@
 import request from 'supertest';
-import express from 'express';
+import express, { Application } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 
@@ -7,9 +7,9 @@ import { typeDefs as messageTestTypeDefs } from '../src/schema/typeDefs';
 import { resolvers as messageTestResolvers } from '../src/resolvers';
 
 describe('Message Resolvers Integration Tests', () => {
-  let app;
-  let server;
-  let testUser;
+  let app: any;
+  let server: ApolloServer;
+  let testUser: any;
 
   beforeEach(async () => {
     const schema = makeExecutableSchema({
@@ -77,8 +77,8 @@ describe('Message Resolvers Integration Tests', () => {
         include: { user: true }
       });
       expect(savedMessage).toBeTruthy();
-      expect(savedMessage.content).toBe('Hello, world!');
-      expect(savedMessage.userId).toBe(testUser.id);
+      expect(savedMessage?.content).toBe('Hello, world!');
+      expect(savedMessage?.userId).toBe(testUser.id);
     });
 
     it('should update user lastSeen when creating message', async () => {
@@ -113,7 +113,7 @@ describe('Message Resolvers Integration Tests', () => {
       const updatedUser = await global.testDb.user.findUnique({
         where: { id: testUser.id }
       });
-      expect(updatedUser.lastSeen.getTime()).toBeGreaterThan(originalLastSeen.getTime());
+      expect(updatedUser?.lastSeen.getTime()).toBeGreaterThan(originalLastSeen.getTime());
     });
 
     it('should fail when creating message with empty content', async () => {

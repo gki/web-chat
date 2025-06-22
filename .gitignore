@@ -10,6 +10,17 @@ dist/
 build/
 *.tsbuildinfo
 
+# TypeScript build artifacts
+*.d.ts
+*.d.ts.map
+*.js.map
+# Exclude JavaScript files generated from TypeScript (but keep config files)
+backend/src/**/*.js
+backend/__tests__/**/*.js
+backend/dist/**/*.js
+frontend/src/**/*.js
+frontend/dist/**/*.js
+
 # Environment variables
 .env
 .env.local

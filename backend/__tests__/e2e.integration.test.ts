@@ -1,5 +1,5 @@
 import request from 'supertest';
-import express from 'express';
+import express, { Application } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 
@@ -7,8 +7,8 @@ import { typeDefs } from '../src/schema/typeDefs';
 import { resolvers } from '../src/resolvers';
 
 describe('E2E Chat Flow Integration Tests', () => {
-  let app;
-  let server;
+  let app: any;
+  let server: ApolloServer;
 
   beforeEach(async () => {
     const schema = makeExecutableSchema({
@@ -101,11 +101,11 @@ describe('E2E Chat Flow Integration Tests', () => {
       const users = getUsersResponse.body.data.users;
       expect(users).toHaveLength(2);
       
-      const userNames = users.map(u => u.name).sort();
+      const userNames = users.map((u: any) => u.name).sort();
       expect(userNames).toEqual(['Alice', 'Bob']);
       
       // Both users should have no messages initially
-      users.forEach(user => {
+      users.forEach((user: any) => {
         expect(user.messages).toEqual([]);
       });
 

@@ -1,5 +1,5 @@
 import request from 'supertest';
-import express from 'express';
+import express, { Application } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 
@@ -7,8 +7,8 @@ import { typeDefs } from '../src/schema/typeDefs';
 import { resolvers } from '../src/resolvers';
 
 describe('User Resolvers Integration Tests', () => {
-  let app;
-  let server;
+  let app: any;
+  let server: ApolloServer;
 
   beforeEach(async () => {
     const schema = makeExecutableSchema({
@@ -65,7 +65,7 @@ describe('User Resolvers Integration Tests', () => {
         where: { id: response.body.data.createUser.id }
       });
       expect(savedUser).toBeTruthy();
-      expect(savedUser.name).toBe('Test User');
+      expect(savedUser?.name).toBe('Test User');
     });
 
     it('should fail when creating user with empty name', async () => {
@@ -287,7 +287,7 @@ describe('User Resolvers Integration Tests', () => {
       const updatedUser = await global.testDb.user.findUnique({
         where: { id: user.id }
       });
-      expect(updatedUser.lastSeen.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime());
+      expect(updatedUser?.lastSeen.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime());
     });
 
     it('should fail for non-existent user', async () => {
