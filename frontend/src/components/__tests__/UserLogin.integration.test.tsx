@@ -218,7 +218,6 @@ describe('UserLogin Integration Tests', () => {
     );
 
     const nameInput = screen.getByTestId('name-input');
-    const joinButton = screen.getByTestId('join-button');
 
     // Try to submit with just spaces
     await user.type(nameInput, '   ');

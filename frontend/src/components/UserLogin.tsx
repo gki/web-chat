@@ -39,7 +39,7 @@ function UserLogin({ onLogin }: UserLoginProps) {
 
     try {
       await createUser({ variables: { name: name.trim() } });
-    } catch (err) {
+    } catch {
       // Error is handled by onError callback
     }
   };

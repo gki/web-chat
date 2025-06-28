@@ -2,6 +2,10 @@ import request from 'supertest';
 import express, { Application } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import { PrismaClient } from '@prisma/client';
+import { execSync } from 'child_process';
+import path from 'path';
+import fs from 'fs';
 
 import { typeDefs } from '../src/schema/typeDefs';
 import { resolvers } from '../src/resolvers';
@@ -9,8 +13,27 @@ import { resolvers } from '../src/resolvers';
 describe('User Resolvers Integration Tests', () => {
   let app: any;
   let server: ApolloServer;
+  let prisma: PrismaClient;
+  let testDbPath: string;
 
   beforeEach(async () => {
+    // Create unique database for this test
+    testDbPath = path.join(__dirname, `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.db`);
+    
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: `file:${testDbPath}`,
+        },
+      },
+    });
+
+    // Initialize database schema
+    execSync('npx prisma db push', {
+      env: { ...process.env, DATABASE_URL: `file:${testDbPath}` },
+      stdio: 'pipe',
+    });
+
     const schema = makeExecutableSchema({
       typeDefs,
       resolvers,
@@ -19,7 +42,7 @@ describe('User Resolvers Integration Tests', () => {
     server = new ApolloServer({
       schema,
       context: () => ({
-        prisma: global.testDb,
+        prisma: prisma,
       }),
     });
 
@@ -30,6 +53,12 @@ describe('User Resolvers Integration Tests', () => {
 
   afterEach(async () => {
     await server.stop();
+    await prisma.$disconnect();
+    
+    // Clean up test database file
+    if (fs.existsSync(testDbPath)) {
+      fs.unlinkSync(testDbPath);
+    }
   });
 
   describe('createUser mutation', () => {
@@ -61,7 +90,7 @@ describe('User Resolvers Integration Tests', () => {
       expect(response.body.data.createUser.id).toBeTruthy();
 
       // Verify user was actually saved to database
-      const savedUser = await global.testDb.user.findUnique({
+      const savedUser = await prisma.user.findUnique({
         where: { id: response.body.data.createUser.id }
       });
       expect(savedUser).toBeTruthy();
@@ -93,7 +122,7 @@ describe('User Resolvers Integration Tests', () => {
       expect(response.body.data?.createUser || null).toBeNull();
 
       // Verify no user was created in database
-      const userCount = await global.testDb.user.count();
+      const userCount = await prisma.user.count();
       expect(userCount).toBe(0);
     });
 
@@ -125,14 +154,14 @@ describe('User Resolvers Integration Tests', () => {
   describe('users query', () => {
     it('should return all users ordered by lastSeen desc', async () => {
       // Create test users directly in database with specific lastSeen times
-      const user1 = await global.testDb.user.create({
+      const user1 = await prisma.user.create({
         data: { 
           name: 'User 1', 
           lastSeen: new Date('2023-01-01T10:00:00Z') 
         }
       });
       
-      const user2 = await global.testDb.user.create({
+      const user2 = await prisma.user.create({
         data: { 
           name: 'User 2', 
           lastSeen: new Date('2023-01-01T11:00:00Z') 
@@ -188,7 +217,7 @@ describe('User Resolvers Integration Tests', () => {
 
   describe('user query', () => {
     it('should return specific user by id', async () => {
-      const user = await global.testDb.user.create({
+      const user = await prisma.user.create({
         data: { name: 'Specific User' }
       });
 
@@ -248,7 +277,7 @@ describe('User Resolvers Integration Tests', () => {
 
   describe('updateUserLastSeen mutation', () => {
     it('should update user lastSeen timestamp', async () => {
-      const user = await global.testDb.user.create({
+      const user = await prisma.user.create({
         data: { 
           name: 'Test User',
           lastSeen: new Date('2023-01-01T10:00:00Z')
@@ -284,7 +313,7 @@ describe('User Resolvers Integration Tests', () => {
       expect(updatedLastSeen.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime());
 
       // Verify database was actually updated
-      const updatedUser = await global.testDb.user.findUnique({
+      const updatedUser = await prisma.user.findUnique({
         where: { id: user.id }
       });
       expect(updatedUser?.lastSeen.getTime()).toBeGreaterThanOrEqual(beforeUpdate.getTime());

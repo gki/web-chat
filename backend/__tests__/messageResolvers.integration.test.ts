@@ -2,6 +2,10 @@ import request from 'supertest';
 import express, { Application } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import { PrismaClient } from '@prisma/client';
+import { execSync } from 'child_process';
+import path from 'path';
+import fs from 'fs';
 
 import { typeDefs as messageTestTypeDefs } from '../src/schema/typeDefs';
 import { resolvers as messageTestResolvers } from '../src/resolvers';
@@ -10,8 +14,27 @@ describe('Message Resolvers Integration Tests', () => {
   let app: any;
   let server: ApolloServer;
   let testUser: any;
+  let prisma: PrismaClient;
+  let testDbPath: string;
 
   beforeEach(async () => {
+    // Create unique database for this test
+    testDbPath = path.join(__dirname, `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.db`);
+    
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: `file:${testDbPath}`,
+        },
+      },
+    });
+
+    // Initialize database schema
+    execSync('npx prisma db push', {
+      env: { ...process.env, DATABASE_URL: `file:${testDbPath}` },
+      stdio: 'pipe',
+    });
+
     const schema = makeExecutableSchema({
       typeDefs: messageTestTypeDefs,
       resolvers: messageTestResolvers,
@@ -20,7 +43,7 @@ describe('Message Resolvers Integration Tests', () => {
     server = new ApolloServer({
       schema,
       context: () => ({
-        prisma: global.testDb,
+        prisma: prisma,
       }),
     });
 
@@ -29,13 +52,19 @@ describe('Message Resolvers Integration Tests', () => {
     server.applyMiddleware({ app, path: '/graphql' });
 
     // Create a test user for message tests
-    testUser = await global.testDb.user.create({
+    testUser = await prisma.user.create({
       data: { name: 'Test User' }
     });
   });
 
   afterEach(async () => {
     await server.stop();
+    await prisma.$disconnect();
+    
+    // Clean up test database file
+    if (fs.existsSync(testDbPath)) {
+      fs.unlinkSync(testDbPath);
+    }
   });
 
   describe('createMessage mutation', () => {
@@ -72,7 +101,7 @@ describe('Message Resolvers Integration Tests', () => {
       expect(response.body.data.createMessage.user.name).toBe('Test User');
 
       // Verify message was actually saved to database
-      const savedMessage = await global.testDb.message.findUnique({
+      const savedMessage = await prisma.message.findUnique({
         where: { id: response.body.data.createMessage.id },
         include: { user: true }
       });
@@ -110,7 +139,7 @@ describe('Message Resolvers Integration Tests', () => {
       expect(response.body.errors).toBeUndefined();
 
       // Verify user's lastSeen was updated
-      const updatedUser = await global.testDb.user.findUnique({
+      const updatedUser = await prisma.user.findUnique({
         where: { id: testUser.id }
       });
       expect(updatedUser?.lastSeen.getTime()).toBeGreaterThan(originalLastSeen.getTime());
@@ -142,7 +171,7 @@ describe('Message Resolvers Integration Tests', () => {
       expect(response.body.data?.createMessage || null).toBeNull();
 
       // Verify no message was created
-      const messageCount = await global.testDb.message.count();
+      const messageCount = await prisma.message.count();
       expect(messageCount).toBe(0);
     });
 
@@ -228,7 +257,7 @@ describe('Message Resolvers Integration Tests', () => {
   describe('messages query', () => {
     it('should return all messages ordered by createdAt asc', async () => {
       // Create test messages with specific timestamps
-      const message1 = await global.testDb.message.create({
+      const message1 = await prisma.message.create({
         data: {
           content: 'First message',
           userId: testUser.id,
@@ -236,7 +265,7 @@ describe('Message Resolvers Integration Tests', () => {
         }
       });
 
-      const message2 = await global.testDb.message.create({
+      const message2 = await prisma.message.create({
         data: {
           content: 'Second message',
           userId: testUser.id,
@@ -296,7 +325,7 @@ describe('Message Resolvers Integration Tests', () => {
     });
 
     it('should include user information with each message', async () => {
-      const message = await global.testDb.message.create({
+      const message = await prisma.message.create({
         data: {
           content: 'Test message',
           userId: testUser.id
@@ -334,7 +363,7 @@ describe('Message Resolvers Integration Tests', () => {
   describe('User.messages resolver', () => {
     it('should return user messages when querying user', async () => {
       // Create messages for the user
-      await global.testDb.message.createMany({
+      await prisma.message.createMany({
         data: [
           { content: 'Message 1', userId: testUser.id },
           { content: 'Message 2', userId: testUser.id }

@@ -46,7 +46,7 @@ function MessageInput({ currentUser, onMessageSent }: MessageInputProps) {
           userId: currentUser.id,
         },
       });
-    } catch (err) {
+    } catch {
       // Error is handled by onError callback
     }
   };
@@ -54,7 +54,7 @@ function MessageInput({ currentUser, onMessageSent }: MessageInputProps) {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as any);
+      handleSubmit(e as React.FormEvent);
     }
   };
 

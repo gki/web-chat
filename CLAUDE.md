@@ -20,7 +20,7 @@ Real-time chat application built with Node.js, React, GraphQL, and SQLite. Uses 
 ```bash
 npm install                    # Install all dependencies
 npm run dev                    # Start both backend and frontend
-npm test                       # Run all tests (52 tests total)
+npm test                       # Run all tests (45 tests total)
 npm run lint                   # Lint all code
 npm run format                 # Format all code
 npm run codegen                # Generate GraphQL types
@@ -112,7 +112,7 @@ npm test -- --watch basic.test.ts
 ### Git and Build Management
 - **Source only**: Only commit TypeScript source files, not generated JavaScript
 - **Type safety**: All commits must pass TypeScript compilation with strict settings
-- **Test success**: All 52 tests must pass before any commit
+- **Test success**: All 45 tests must pass before any commit
 
 ### GraphQL Integration
 - **Schema-first**: GraphQL schema drives type generation
@@ -141,3 +141,78 @@ npm test -- --watch basic.test.ts
 - **Resolver implementation**: Use generated `*Resolvers` types exclusively  
 - **Frontend queries**: Use generated hooks from `frontend/src/generated/graphql.ts`
 - **Error resolution**: Fix type errors with proper typing, never with type assertions
+
+### Code Quality and Lint Management
+
+#### Lint Error Resolution Workflow
+When fixing lint errors, follow this systematic approach:
+
+1. **Incremental Fixes**: Fix lint errors one by one, testing after each change
+2. **Verification Required**: Always run `npm run lint` and `npm test` after each fix
+3. **Never Break Tests**: Ensure all tests continue passing during lint fixes
+4. **Test-Driven Approach**: Verify that fixes don't introduce regressions
+
+#### Common Lint Error Patterns and Solutions
+
+**Unused Variables and Imports:**
+- Remove unused imports immediately
+- For unused catch parameters: `catch (error)` → `catch` (omit parameter)
+- For unused function parameters: prefix with underscore `_unused` or remove if possible
+- Remove unused variables in test files when they serve no purpose
+
+**Type Safety Issues:**
+- Replace `any` types with proper TypeScript types
+- Use `React.FormEvent` instead of `any` for event handlers
+- Never use `as any` - find the proper type instead
+
+**Console Statement Management:**
+- Allow `console.error` and `console.warn` for important debugging
+- Convert `console.log` to `console.warn` for better semantic meaning
+- Disable console rules in test files and setup files via ESLint configuration
+- For server files, disable console rules entirely as logging is essential
+
+**Generated File Handling:**
+- Never manually edit generated files (`**/generated/**/*`, `**/*generated*`)
+- Configure ESLint to ignore generated files for type and style rules
+- If lint errors persist in generated files, fix the generation configuration
+
+#### ESLint Configuration Best Practices
+
+**Rule Overrides by File Type:**
+```javascript
+// Generated files - ignore type rules
+{ files: ['**/generated/**/*'], rules: { '@typescript-eslint/no-explicit-any': 'off' } }
+
+// Test files - relax rules for testing convenience  
+{ files: ['**/*.test.*'], rules: { 'no-console': 'off' } }
+
+// Server files - allow console for logging
+{ files: ['**/server.ts'], rules: { 'no-console': 'off' } }
+```
+
+**Database Testing Architecture:**
+- **Isolated Test Databases**: Each test creates its own temporary SQLite database
+- **Proper Cleanup**: Always disconnect and delete test database files in `afterEach`
+- **No Global State**: Avoid global test database instances - use local `PrismaClient` per test
+- **Schema Initialization**: Run `npx prisma db push` for each test database setup
+
+#### Test Database Migration Pattern
+```typescript
+// Good: Local database per test
+beforeEach(async () => {
+  testDbPath = path.join(__dirname, `test-${Date.now()}-${Math.random()}.db`);
+  prisma = new PrismaClient({ datasources: { db: { url: `file:${testDbPath}` } } });
+  execSync('npx prisma db push', { env: { DATABASE_URL: `file:${testDbPath}` } });
+});
+
+afterEach(async () => {
+  await prisma.$disconnect();
+  if (fs.existsSync(testDbPath)) fs.unlinkSync(testDbPath);
+});
+```
+
+#### Commit Requirements
+- **Zero Lint Errors**: All lint errors must be resolved before commit
+- **All Tests Passing**: Both backend (26 tests) and frontend (19 tests) must pass
+- **Type Compilation**: TypeScript must compile without errors in strict mode
+- **Generated Files Excluded**: Never commit auto-generated JavaScript or type definition files

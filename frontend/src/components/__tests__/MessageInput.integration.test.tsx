@@ -245,7 +245,6 @@ describe('MessageInput Integration Tests', () => {
     );
 
     const messageInput = screen.getByTestId('message-input');
-    const sendButton = screen.getByTestId('send-button');
 
     // Try to submit with just spaces
     await user.type(messageInput, '   ');

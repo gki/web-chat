@@ -1,7 +1,6 @@
 import { PubSub } from 'graphql-subscriptions';
 import { validateMessageContent } from '../utils/validation';
-import { GraphQLContext } from '../types/context';
-import { MessageResolvers, QueryResolvers, MutationResolvers, SubscriptionResolvers } from '../generated/graphql';
+import { MessageResolvers, QueryResolvers, MutationResolvers } from '../generated/graphql';
 
 const pubsub = new PubSub();
 

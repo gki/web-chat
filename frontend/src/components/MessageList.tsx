@@ -88,7 +88,7 @@ function MessageList({ messages, loading, error, currentUserId }) {
                 });
               }
             }
-          } catch (error) {
+          } catch {
             console.warn('Invalid date for message:', message.id, message.createdAt);
             messageTime = '時刻不明';
           }

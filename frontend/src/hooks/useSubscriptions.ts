@@ -64,9 +64,9 @@ export function useUserSubscription(client) {
             });
           }
         }
-      } catch (error) {
+      } catch {
         // Query might not exist in cache yet, that's okay
-        console.log('Users query not in cache yet');
+        console.warn('Users query not in cache yet');
       }
     }
   }, [userData, client]);

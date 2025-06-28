@@ -2,6 +2,10 @@ import request from 'supertest';
 import express, { Application } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import { PrismaClient } from '@prisma/client';
+import { execSync } from 'child_process';
+import path from 'path';
+import fs from 'fs';
 
 import { typeDefs } from '../src/schema/typeDefs';
 import { resolvers } from '../src/resolvers';
@@ -9,8 +13,27 @@ import { resolvers } from '../src/resolvers';
 describe('E2E Chat Flow Integration Tests', () => {
   let app: any;
   let server: ApolloServer;
+  let prisma: PrismaClient;
+  let testDbPath: string;
 
   beforeEach(async () => {
+    // Create unique database for this test
+    testDbPath = path.join(__dirname, `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.db`);
+    
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: `file:${testDbPath}`,
+        },
+      },
+    });
+
+    // Initialize database schema
+    execSync('npx prisma db push', {
+      env: { ...process.env, DATABASE_URL: `file:${testDbPath}` },
+      stdio: 'pipe',
+    });
+
     const schema = makeExecutableSchema({
       typeDefs,
       resolvers,
@@ -19,7 +42,7 @@ describe('E2E Chat Flow Integration Tests', () => {
     server = new ApolloServer({
       schema,
       context: () => ({
-        prisma: global.testDb,
+        prisma: prisma,
       }),
     });
 
@@ -30,6 +53,12 @@ describe('E2E Chat Flow Integration Tests', () => {
 
   afterEach(async () => {
     await server.stop();
+    await prisma.$disconnect();
+    
+    // Clean up test database file
+    if (fs.existsSync(testDbPath)) {
+      fs.unlinkSync(testDbPath);
+    }
   });
 
   describe('Complete Chat Flow', () => {
@@ -287,14 +316,14 @@ describe('E2E Chat Flow Integration Tests', () => {
       expect(newLastSeen.getTime()).toBeGreaterThanOrEqual(originalLastSeen.getTime());
 
       // Step 10: Verify final database state
-      const finalDbUserCount = await global.testDb.user.count();
-      const finalDbMessageCount = await global.testDb.message.count();
+      const finalDbUserCount = await prisma.user.count();
+      const finalDbMessageCount = await prisma.message.count();
       
       expect(finalDbUserCount).toBe(2);
       expect(finalDbMessageCount).toBe(3);
 
       // Verify database relationships
-      const dbMessages = await global.testDb.message.findMany({
+      const dbMessages = await prisma.message.findMany({
         include: { user: true },
         orderBy: { createdAt: 'asc' }
       });
@@ -329,7 +358,7 @@ describe('E2E Chat Flow Integration Tests', () => {
       });
 
       // Verify all users were created
-      const userCount = await global.testDb.user.count();
+      const userCount = await prisma.user.count();
       expect(userCount).toBe(3);
     });
 
@@ -344,7 +373,7 @@ describe('E2E Chat Flow Integration Tests', () => {
       expect(invalidUserNameResponse.body.errors).toBeDefined();
 
       // Create valid user for message tests
-      const validUser = await global.testDb.user.create({
+      const validUser = await prisma.user.create({
         data: { name: 'Valid User' }
       });
 

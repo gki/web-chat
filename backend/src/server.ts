@@ -25,7 +25,7 @@ export async function startServer() {
 
   const server = new ApolloServer({
     schema,
-    context: ({ req }): GraphQLContext => ({
+    context: (): GraphQLContext => ({
       prisma,
     }),
     plugins: [

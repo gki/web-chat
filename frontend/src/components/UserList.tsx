@@ -59,7 +59,7 @@ function UserList({ users, loading, currentUserId }) {
               isOnline = Date.now() - lastSeenDate.getTime() < 5 * 60 * 1000;
             }
           }
-        } catch (error) {
+        } catch {
           console.warn('Invalid date for user:', user.id, user.lastSeen);
         }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -6,11 +6,10 @@ import {
   Typography,
   AppBar,
   Toolbar,
-  IconButton,
   Button,
 } from '@mui/material';
 import { ExitToApp } from '@mui/icons-material';
-import { useQuery, useMutation, useApolloClient } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 
 import {
   GET_MESSAGES,
@@ -29,7 +28,6 @@ interface ChatRoomProps {
 }
 
 function ChatRoom({ currentUser, onLogout }: ChatRoomProps) {
-  const client = useApolloClient();
   const [updateUserLastSeen] = useMutation(UPDATE_USER_LAST_SEEN);
 
   // Set up subscriptions (temporarily disabled)

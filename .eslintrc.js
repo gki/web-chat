@@ -23,16 +23,17 @@ module.exports = {
       plugins: ['@typescript-eslint'],
       extends: [
         'eslint:recommended',
-        '@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/recommended',
       ],
       parserOptions: {
-        project: './backend/tsconfig.json',
+        project: './tsconfig.json',
       },
       rules: {
         '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-explicit-any': 'warn',
+        'no-console': ['warn', { allow: ['error'] }],
       },
     },
     {
@@ -45,12 +46,12 @@ module.exports = {
       },
       extends: [
         'eslint:recommended',
-        '@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/recommended',
         'plugin:react/recommended',
         'plugin:react-hooks/recommended',
       ],
       parserOptions: {
-        project: './frontend/tsconfig.json',
+        project: './tsconfig.json',
         ecmaFeatures: {
           jsx: true,
         },
@@ -67,15 +68,30 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-explicit-any': 'warn',
+        'no-console': ['warn', { allow: ['warn', 'error'] }],
       },
     },
     {
-      files: ['**/*.test.js', '**/*.test.ts', '**/*.test.jsx', '**/*.test.tsx'],
+      files: ['**/*.test.js', '**/*.test.ts', '**/*.test.jsx', '**/*.test.tsx', '**/setupTests.ts'],
       env: {
         jest: true,
       },
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',
+        'no-console': 'off',
+      },
+    },
+    {
+      files: ['**/generated/**/*', '**/*generated*'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-empty-object-type': 'off',
+      },
+    },
+    {
+      files: ['**/server.ts'],
+      rules: {
+        'no-console': 'off',
       },
     },
   ],
