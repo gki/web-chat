@@ -78,7 +78,7 @@ function ChatRoom({ currentUser, onLogout }: ChatRoomProps) {
 
   return (
     <Box sx={{
-      height: '100%',
+      height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       overflow: 'hidden'
@@ -104,17 +104,17 @@ function ChatRoom({ currentUser, onLogout }: ChatRoomProps) {
         spacing={2}
         sx={{
           flexGrow: 1,
-          height: 0,
           minHeight: 0,
-          overflow: 'hidden'
+          overflow: 'hidden',
+          height: '100%'
         }}
       >
-        <Grid item xs={12} md={8} sx={{ height: '100%', display: 'flex' }}>
+        <Grid item xs={12} md={8} sx={{ display: 'flex', height: '100%' }}>
           <Paper
             elevation={1}
             sx={{
-              height: '100%',
               width: '100%',
+              height: '100%',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden'
@@ -148,12 +148,12 @@ function ChatRoom({ currentUser, onLogout }: ChatRoomProps) {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4} sx={{ height: '100%', display: 'flex' }}>
+        <Grid item xs={12} md={4} sx={{ display: 'flex', height: '100%' }}>
           <Paper
             elevation={1}
             sx={{
-              height: '100%',
               width: '100%',
+              height: '100%',
               p: 2,
               display: 'flex',
               flexDirection: 'column',

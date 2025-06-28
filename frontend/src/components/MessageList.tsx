@@ -19,7 +19,7 @@ function MessageList({ messages, loading, error, currentUserId }) {
 
   const scrollToBottom = useCallback((smooth = true) => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ 
+      messagesEndRef.current.scrollIntoView({
         behavior: smooth ? 'smooth' : 'auto',
         block: 'end'
       });
@@ -29,7 +29,7 @@ function MessageList({ messages, loading, error, currentUserId }) {
   // Optimized scroll logic - only scroll if new messages are added
   useEffect(() => {
     const messageCount = messages.length;
-    
+
     // Only scroll to bottom if new messages were added
     if (messageCount > lastMessageCountRef.current) {
       // For initial load or many new messages, scroll immediately
@@ -40,7 +40,7 @@ function MessageList({ messages, loading, error, currentUserId }) {
         scrollToBottom(true);
       }
     }
-    
+
     lastMessageCountRef.current = messageCount;
   }, [messages, scrollToBottom]);
 
@@ -91,7 +91,7 @@ function MessageList({ messages, loading, error, currentUserId }) {
     <Box
       ref={containerRef}
       sx={{
-        height: '100%',
+        flex: '1 1 0',
         overflow: 'auto',
         p: 1,
         display: 'flex',
@@ -118,7 +118,7 @@ function MessageList({ messages, loading, error, currentUserId }) {
           const isOwnMessage = message.user.id === currentUserId;
           const isLastMessage = index === messages.length - 1;
           let messageTime = '';
-          
+
           try {
             if (message.createdAt) {
               const createdAtDate = new Date(message.createdAt);
@@ -182,7 +182,7 @@ function MessageList({ messages, loading, error, currentUserId }) {
                   </Typography>
                   <Typography
                     variant="body2"
-                    sx={{ 
+                    sx={{
                       wordBreak: 'break-word',
                       whiteSpace: 'pre-wrap',
                       lineHeight: 1.4
@@ -197,14 +197,14 @@ function MessageList({ messages, loading, error, currentUserId }) {
           );
         })}
       </List>
-      <div 
-        ref={messagesEndRef} 
-        style={{ 
-          height: '1px', 
+      <div
+        ref={messagesEndRef}
+        style={{
+          height: '1px',
           width: '100%',
           minHeight: '1px',
           flexShrink: 0
-        }} 
+        }}
       />
     </Box>
   );
