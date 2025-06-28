@@ -77,8 +77,13 @@ function ChatRoom({ currentUser, onLogout }: ChatRoomProps) {
   };
 
   return (
-    <Box sx={{ height: '80vh', display: 'flex', flexDirection: 'column' }}>
-      <AppBar position="static" color="primary" sx={{ mb: 2 }}>
+    <Box sx={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
+      <AppBar position="static" color="primary" sx={{ mb: 2, flexShrink: 0 }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             チャットルーム - {currentUser.name}
@@ -94,17 +99,34 @@ function ChatRoom({ currentUser, onLogout }: ChatRoomProps) {
         </Toolbar>
       </AppBar>
 
-      <Grid container spacing={2} sx={{ flexGrow: 1, height: 0 }}>
-        <Grid item xs={12} md={8}>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          flexGrow: 1,
+          height: 0,
+          minHeight: 0,
+          overflow: 'hidden'
+        }}
+      >
+        <Grid item xs={12} md={8} sx={{ height: '100%', display: 'flex' }}>
           <Paper
             elevation={1}
             sx={{
               height: '100%',
+              width: '100%',
               display: 'flex',
               flexDirection: 'column',
+              overflow: 'hidden'
             }}
           >
-            <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+            <Box sx={{
+              flexGrow: 1,
+              overflow: 'hidden',
+              minHeight: 0,
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
               <MessageList
                 messages={messagesData?.messages || []}
                 loading={messagesLoading}
@@ -112,7 +134,12 @@ function ChatRoom({ currentUser, onLogout }: ChatRoomProps) {
                 currentUserId={currentUser.id}
               />
             </Box>
-            <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+            <Box sx={{
+              p: 2,
+              borderTop: 1,
+              borderColor: 'divider',
+              flexShrink: 0
+            }}>
               <MessageInput
                 currentUser={currentUser}
                 onMessageSent={handleMessageSent}
@@ -121,16 +148,28 @@ function ChatRoom({ currentUser, onLogout }: ChatRoomProps) {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Paper elevation={1} sx={{ height: '100%', p: 2 }}>
-            <Typography variant="h6" gutterBottom>
+        <Grid item xs={12} md={4} sx={{ height: '100%', display: 'flex' }}>
+          <Paper
+            elevation={1}
+            sx={{
+              height: '100%',
+              width: '100%',
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden'
+            }}
+          >
+            <Typography variant="h6" gutterBottom sx={{ flexShrink: 0 }}>
               オンラインユーザー
             </Typography>
-            <UserList
-              users={usersData?.users || []}
-              loading={usersLoading}
-              currentUserId={currentUser.id}
-            />
+            <Box sx={{ flexGrow: 1, overflow: 'auto', minHeight: 0 }}>
+              <UserList
+                users={usersData?.users || []}
+                loading={usersLoading}
+                currentUserId={currentUser.id}
+              />
+            </Box>
           </Paper>
         </Grid>
       </Grid>

@@ -76,8 +76,8 @@ function UserLogin({ onLogin }: UserLoginProps) {
         disabled={loading}
         inputProps={{
           maxLength: 50,
-          'data-testid': 'name-input',
         }}
+        data-testid="name-input"
         helperText="チャットで表示される名前を入力してください"
       />
 

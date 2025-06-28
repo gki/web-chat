@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   List,
@@ -14,14 +14,35 @@ import { ja } from 'date-fns/locale';
 
 function MessageList({ messages, loading, error, currentUserId }) {
   const messagesEndRef = useRef(null);
+  const containerRef = useRef(null);
+  const lastMessageCountRef = useRef(0);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const scrollToBottom = useCallback((smooth = true) => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: smooth ? 'smooth' : 'auto',
+        block: 'end'
+      });
+    }
+  }, []);
 
+  // Optimized scroll logic - only scroll if new messages are added
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    const messageCount = messages.length;
+    
+    // Only scroll to bottom if new messages were added
+    if (messageCount > lastMessageCountRef.current) {
+      // For initial load or many new messages, scroll immediately
+      if (lastMessageCountRef.current === 0 || messageCount - lastMessageCountRef.current > 5) {
+        scrollToBottom(false);
+      } else {
+        // For single new messages, smooth scroll
+        scrollToBottom(true);
+      }
+    }
+    
+    lastMessageCountRef.current = messageCount;
+  }, [messages, scrollToBottom]);
 
   if (loading && messages.length === 0) {
     return (
@@ -68,15 +89,34 @@ function MessageList({ messages, loading, error, currentUserId }) {
 
   return (
     <Box
+      ref={containerRef}
       sx={{
         height: '100%',
         overflow: 'auto',
         p: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        scrollBehavior: 'smooth',
+        '&::-webkit-scrollbar': {
+          width: '6px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: 'rgba(0,0,0,0.1)',
+          borderRadius: '3px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: 'rgba(0,0,0,0.3)',
+          borderRadius: '3px',
+          '&:hover': {
+            background: 'rgba(0,0,0,0.5)',
+          },
+        },
       }}
     >
-      <List sx={{ py: 0 }}>
-        {messages.map((message) => {
+      <List sx={{ py: 0, flexGrow: 1 }}>
+        {messages.map((message, index) => {
           const isOwnMessage = message.user.id === currentUserId;
+          const isLastMessage = index === messages.length - 1;
           let messageTime = '';
           
           try {
@@ -99,7 +139,8 @@ function MessageList({ messages, loading, error, currentUserId }) {
               sx={{
                 display: 'flex',
                 justifyContent: isOwnMessage ? 'flex-end' : 'flex-start',
-                mb: 1,
+                mb: isLastMessage ? 0 : 1,
+                pb: isLastMessage ? 2 : 1,
               }}
             >
               <Box
@@ -117,6 +158,7 @@ function MessageList({ messages, loading, error, currentUserId }) {
                     height: 32,
                     bgcolor: isOwnMessage ? 'primary.main' : 'secondary.main',
                     fontSize: '0.875rem',
+                    flexShrink: 0,
                   }}
                 >
                   {message.user.name.charAt(0)}
@@ -128,6 +170,7 @@ function MessageList({ messages, loading, error, currentUserId }) {
                     p: 1.5,
                     bgcolor: isOwnMessage ? 'primary.50' : 'grey.100',
                     borderRadius: 2,
+                    minWidth: 0, // Allow text wrapping
                   }}
                 >
                   <Typography
@@ -139,7 +182,11 @@ function MessageList({ messages, loading, error, currentUserId }) {
                   </Typography>
                   <Typography
                     variant="body2"
-                    sx={{ wordBreak: 'break-word' }}
+                    sx={{ 
+                      wordBreak: 'break-word',
+                      whiteSpace: 'pre-wrap',
+                      lineHeight: 1.4
+                    }}
                     data-testid={`message-${message.id}`}
                   >
                     {message.content}
@@ -150,7 +197,15 @@ function MessageList({ messages, loading, error, currentUserId }) {
           );
         })}
       </List>
-      <div ref={messagesEndRef} />
+      <div 
+        ref={messagesEndRef} 
+        style={{ 
+          height: '1px', 
+          width: '100%',
+          minHeight: '1px',
+          flexShrink: 0
+        }} 
+      />
     </Box>
   );
 }

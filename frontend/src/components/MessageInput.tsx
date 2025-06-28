@@ -86,8 +86,8 @@ function MessageInput({ currentUser, onMessageSent }: MessageInputProps) {
           disabled={loading}
           inputProps={{
             maxLength: 1000,
-            'data-testid': 'message-input',
           }}
+          data-testid="message-input"
           variant="outlined"
           size="small"
         />

@@ -44,7 +44,7 @@ describe('UserLogin Integration Tests', () => {
       </MockedProvider>
     );
 
-    const nameInput = screen.getByTestId('name-input');
+    const nameInput = screen.getByTestId('name-input').querySelector('input');
     const joinButton = screen.getByTestId('join-button');
 
     // Initially button should be disabled
@@ -101,7 +101,7 @@ describe('UserLogin Integration Tests', () => {
       </MockedProvider>
     );
 
-    const nameInput = screen.getByTestId('name-input');
+    const nameInput = screen.getByTestId('name-input').querySelector('input');
     const joinButton = screen.getByTestId('join-button');
 
     await user.type(nameInput, 'Error User');
@@ -146,7 +146,7 @@ describe('UserLogin Integration Tests', () => {
       </MockedProvider>
     );
 
-    const nameInput = screen.getByTestId('name-input');
+    const nameInput = screen.getByTestId('name-input').querySelector('input');
     const joinButton = screen.getByTestId('join-button');
 
     await user.type(nameInput, 'Invalid User');
@@ -190,7 +190,7 @@ describe('UserLogin Integration Tests', () => {
       </MockedProvider>
     );
 
-    const nameInput = screen.getByTestId('name-input');
+    const nameInput = screen.getByTestId('name-input').querySelector('input');
     const joinButton = screen.getByTestId('join-button');
 
     // Type with extra whitespace
@@ -217,7 +217,7 @@ describe('UserLogin Integration Tests', () => {
       </MockedProvider>
     );
 
-    const nameInput = screen.getByTestId('name-input');
+    const nameInput = screen.getByTestId('name-input').querySelector('input');
 
     // Try to submit with just spaces
     await user.type(nameInput, '   ');
@@ -255,7 +255,7 @@ describe('UserLogin Integration Tests', () => {
       </MockedProvider>
     );
 
-    const nameInput = screen.getByTestId('name-input');
+    const nameInput = screen.getByTestId('name-input').querySelector('input');
     const joinButton = screen.getByTestId('join-button');
 
     await user.type(nameInput, 'Network Test User');

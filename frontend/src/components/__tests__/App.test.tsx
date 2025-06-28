@@ -5,7 +5,7 @@ import { MockedProvider } from '@apollo/client/testing';
 import App from '../../App';
 import { localStorage } from '../../utils/localStorage';
 import { SavedUser } from '../../types/user';
-import { GET_USER_BY_ID, UPDATE_USER_LAST_SEEN, CREATE_USER } from '../../apollo/queries';
+import { GET_USER_BY_ID, UPDATE_USER_LAST_SEEN, CREATE_USER, GET_MESSAGES, GET_USERS } from '../../apollo/queries';
 
 // Mock localStorage
 jest.mock('../../utils/localStorage', () => ({
@@ -72,6 +72,29 @@ const createUserMock = {
   }
 };
 
+// ChatRoom polling queries mocks
+const getMessagesMock = {
+  request: {
+    query: GET_MESSAGES
+  },
+  result: {
+    data: {
+      messages: []
+    }
+  }
+};
+
+const getUsersMock = {
+  request: {
+    query: GET_USERS
+  },
+  result: {
+    data: {
+      users: [mockValidUser]
+    }
+  }
+};
+
 describe('App Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -129,7 +152,12 @@ describe('App Integration', () => {
 
     it('handles existing user selection successfully', async () => {
       render(
-        <MockedProvider mocks={[validUserMock, updateLastSeenMock]} addTypename={false}>
+        <MockedProvider mocks={[
+          validUserMock,
+          updateLastSeenMock,
+          getMessagesMock,
+          getUsersMock
+        ]} addTypename={false}>
           <App />
         </MockedProvider>
       );
@@ -212,12 +240,12 @@ describe('App Integration', () => {
 
     it('saves user to localStorage after successful login', async () => {
       render(
-        <MockedProvider mocks={[createUserMock]} addTypename={false}>
+        <MockedProvider mocks={[createUserMock, getUsersMock, getMessagesMock]} addTypename={false}>
           <App />
         </MockedProvider>
       );
 
-      const nameInput = screen.getByTestId('name-input');
+      const nameInput = screen.getByTestId('name-input').querySelector('input');
       const joinButton = screen.getByTestId('join-button');
 
       fireEvent.change(nameInput, { target: { value: '新しいユーザー' } });
@@ -240,7 +268,12 @@ describe('App Integration', () => {
       (localStorage.isAvailable as jest.Mock).mockReturnValue(true);
 
       render(
-        <MockedProvider mocks={[validUserMock, updateLastSeenMock]} addTypename={false}>
+        <MockedProvider mocks={[
+          validUserMock,
+          updateLastSeenMock,
+          getMessagesMock,
+          getUsersMock
+        ]} addTypename={false}>
           <App />
         </MockedProvider>
       );
@@ -289,6 +322,59 @@ describe('App Integration', () => {
       await waitFor(() => {
         expect(screen.getByText('ユーザーの確認に失敗しました。しばらくしてから再試行してください。')).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('Layout and scroll behavior', () => {
+    beforeEach(() => {
+      (localStorage.getLastUser as jest.Mock).mockReturnValue(mockSavedUser);
+      (localStorage.isAvailable as jest.Mock).mockReturnValue(true);
+    });
+
+    it('applies correct layout styles for chat state', async () => {
+      render(
+        <MockedProvider mocks={[
+          validUserMock,
+          updateLastSeenMock,
+          getMessagesMock,
+          getUsersMock
+        ]} addTypename={false}>
+          <App />
+        </MockedProvider>
+      );
+
+      const existingUserButton = screen.getByTestId('select-existing-user-button');
+      fireEvent.click(existingUserButton);
+
+      // Wait for transition to chat state
+      await waitFor(() => {
+        expect(screen.getByText('チャットルーム - テストユーザー')).toBeInTheDocument();
+      }, { timeout: 3000 });
+
+      // Check that the main container has proper layout styles
+      const appTitle = screen.getByText('チャットアプリ');
+      const paperContainer = appTitle.closest('[class*="MuiPaper-root"]');
+
+      expect(paperContainer).toBeInTheDocument();
+      // The container should have flex display when in chat mode
+      expect(paperContainer).toHaveStyle('display: flex');
+    });
+
+    it('applies correct layout styles for non-chat states', () => {
+      (localStorage.getLastUser as jest.Mock).mockReturnValue(null);
+
+      render(
+        <MockedProvider mocks={[]} addTypename={false}>
+          <App />
+        </MockedProvider>
+      );
+
+      const appTitle = screen.getByText('チャットアプリ');
+      const paperContainer = appTitle.closest('[class*="MuiPaper-root"]');
+
+      expect(paperContainer).toBeInTheDocument();
+      // Should still have flex display but different overflow behavior
+      expect(paperContainer).toHaveStyle('display: flex');
     });
   });
 });

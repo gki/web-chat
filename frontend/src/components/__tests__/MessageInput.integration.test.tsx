@@ -51,7 +51,7 @@ describe('MessageInput Integration Tests', () => {
       </MockedProvider>
     );
 
-    const messageInput = screen.getByTestId('message-input');
+    const messageInput = screen.getByTestId('message-input').querySelector('textarea') || screen.getByTestId('message-input').querySelector('input');
     const sendButton = screen.getByTestId('send-button');
 
     // Initially button should be disabled
@@ -99,7 +99,7 @@ describe('MessageInput Integration Tests', () => {
       </MockedProvider>
     );
 
-    const messageInput = screen.getByTestId('message-input');
+    const messageInput = screen.getByTestId('message-input').querySelector('textarea') || screen.getByTestId('message-input').querySelector('input');
     const sendButton = screen.getByTestId('send-button');
 
     await user.type(messageInput, 'Error message');
@@ -151,7 +151,7 @@ describe('MessageInput Integration Tests', () => {
       </MockedProvider>
     );
 
-    const messageInput = screen.getByTestId('message-input');
+    const messageInput = screen.getByTestId('message-input').querySelector('textarea') || screen.getByTestId('message-input').querySelector('input');
 
     await user.type(messageInput, 'Enter key message');
     await user.keyboard('{Enter}');
@@ -176,7 +176,7 @@ describe('MessageInput Integration Tests', () => {
       </MockedProvider>
     );
 
-    const messageInput = screen.getByTestId('message-input');
+    const messageInput = screen.getByTestId('message-input').querySelector('textarea') || screen.getByTestId('message-input').querySelector('input');
 
     await user.type(messageInput, 'Line 1');
     await user.keyboard('{Shift>}{Enter}{/Shift}Line 2');
@@ -185,7 +185,7 @@ describe('MessageInput Integration Tests', () => {
     expect(mockOnMessageSent).not.toHaveBeenCalled();
     
     // Should contain multiline content
-    expect(messageInput.value).toContain('Line 1\nLine 2');
+    expect(messageInput).toHaveValue('Line 1\nLine 2');
   });
 
   it('should trim whitespace and create message correctly', async () => {
@@ -222,11 +222,17 @@ describe('MessageInput Integration Tests', () => {
       </MockedProvider>
     );
 
-    const messageInput = screen.getByTestId('message-input');
+    const messageInput = screen.getByTestId('message-input').querySelector('textarea') || screen.getByTestId('message-input').querySelector('input');
     const sendButton = screen.getByTestId('send-button');
 
     // Type with extra whitespace
     await user.type(messageInput, '  Trimmed message  ');
+    
+    // Wait for button to be enabled
+    await waitFor(() => {
+      expect(sendButton).not.toBeDisabled();
+    });
+    
     await user.click(sendButton);
 
     // Should successfully create message
@@ -244,7 +250,7 @@ describe('MessageInput Integration Tests', () => {
       </MockedProvider>
     );
 
-    const messageInput = screen.getByTestId('message-input');
+    const messageInput = screen.getByTestId('message-input').querySelector('textarea') || screen.getByTestId('message-input').querySelector('input');
 
     // Try to submit with just spaces
     await user.type(messageInput, '   ');
@@ -292,10 +298,16 @@ describe('MessageInput Integration Tests', () => {
       </MockedProvider>
     );
 
-    const messageInput = screen.getByTestId('message-input');
+    const messageInput = screen.getByTestId('message-input').querySelector('textarea') || screen.getByTestId('message-input').querySelector('input');
     const sendButton = screen.getByTestId('send-button');
 
     await user.type(messageInput, 'Too long message');
+    
+    // Wait for button to be enabled
+    await waitFor(() => {
+      expect(sendButton).not.toBeDisabled();
+    });
+    
     await user.click(sendButton);
 
     // Should display the validation error
@@ -342,10 +354,19 @@ describe('MessageInput Integration Tests', () => {
       </MockedProvider>
     );
 
-    const messageInput = screen.getByTestId('message-input');
+    const messageInput = screen.getByTestId('message-input').querySelector('textarea') || screen.getByTestId('message-input').querySelector('input');
     const sendButton = screen.getByTestId('send-button');
 
     await user.type(messageInput, 'Loading test message');
+    
+    // Check input value after typing
+    expect(messageInput).toHaveValue('Loading test message');
+    
+    // Wait for button to be enabled
+    await waitFor(() => {
+      expect(sendButton).not.toBeDisabled();
+    }, { timeout: 2000 });
+    
     await user.click(sendButton);
 
     // During loading, input and button should be disabled

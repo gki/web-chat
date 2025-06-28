@@ -159,8 +159,18 @@ function App() {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Paper elevation={3} sx={{ p: 4, minHeight: '80vh' }}>
-        <Box sx={{ mb: 4, textAlign: 'center' }}>
+      <Paper 
+        elevation={3} 
+        sx={{ 
+          p: 4, 
+          minHeight: appState === 'chat' ? 'auto' : '80vh',
+          maxHeight: appState === 'chat' ? '90vh' : 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: appState === 'chat' ? 'hidden' : 'visible'
+        }}
+      >
+        <Box sx={{ mb: 4, textAlign: 'center', flexShrink: 0 }}>
           <Typography variant="h3" component="h1" gutterBottom>
             チャットアプリ
           </Typography>
@@ -169,7 +179,14 @@ function App() {
           </Typography>
         </Box>
 
-        {renderContent()}
+        <Box sx={{ 
+          flexGrow: 1, 
+          overflow: appState === 'chat' ? 'hidden' : 'visible',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {renderContent()}
+        </Box>
       </Paper>
     </Container>
   );
