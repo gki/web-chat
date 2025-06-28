@@ -5,6 +5,12 @@ export interface User {
   lastSeen: string;
 }
 
+export interface SavedUser {
+  id: string;
+  name: string;
+  lastSeen: string;
+}
+
 export interface Message {
   id: string;
   content: string;

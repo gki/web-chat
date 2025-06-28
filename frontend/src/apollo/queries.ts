@@ -12,6 +12,17 @@ export const GET_USERS = gql`
   }
 `;
 
+export const GET_USER_BY_ID = gql`
+  query GetUserById($id: ID!) {
+    user(id: $id) {
+      id
+      name
+      createdAt
+      lastSeen
+    }
+  }
+`;
+
 export const CREATE_USER = gql`
   mutation CreateUser($name: String!) {
     createUser(name: $name) {

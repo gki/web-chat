@@ -98,6 +98,21 @@ export type GetUsersQuery = {
   }>;
 };
 
+export type GetUserByIdQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type GetUserByIdQuery = {
+  __typename?: 'Query';
+  user?: {
+    __typename?: 'User';
+    id: string;
+    name: string;
+    createdAt: any;
+    lastSeen: any;
+  } | null;
+};
+
 export type CreateUserMutationVariables = Exact<{
   name: Scalars['String']['input'];
 }>;
@@ -271,6 +286,127 @@ export type GetUsersSuspenseQueryHookResult = ReturnType<
 export type GetUsersQueryResult = Apollo.QueryResult<
   GetUsersQuery,
   GetUsersQueryVariables
+>;
+export const GetUserByIdDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetUserById' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'user' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'lastSeen' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode;
+
+/**
+ * __useGetUserByIdQuery__
+ *
+ * To run a query within a React component, call `useGetUserByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetUserByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetUserByIdQuery,
+    GetUserByIdQueryVariables
+  > &
+    (
+      | { variables: GetUserByIdQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetUserByIdQuery, GetUserByIdQueryVariables>(
+    GetUserByIdDocument,
+    options
+  );
+}
+export function useGetUserByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetUserByIdQuery,
+    GetUserByIdQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetUserByIdQuery, GetUserByIdQueryVariables>(
+    GetUserByIdDocument,
+    options
+  );
+}
+export function useGetUserByIdSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetUserByIdQuery,
+        GetUserByIdQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetUserByIdQuery, GetUserByIdQueryVariables>(
+    GetUserByIdDocument,
+    options
+  );
+}
+export type GetUserByIdQueryHookResult = ReturnType<typeof useGetUserByIdQuery>;
+export type GetUserByIdLazyQueryHookResult = ReturnType<
+  typeof useGetUserByIdLazyQuery
+>;
+export type GetUserByIdSuspenseQueryHookResult = ReturnType<
+  typeof useGetUserByIdSuspenseQuery
+>;
+export type GetUserByIdQueryResult = Apollo.QueryResult<
+  GetUserByIdQuery,
+  GetUserByIdQueryVariables
 >;
 export const CreateUserDocument = {
   kind: 'Document',
