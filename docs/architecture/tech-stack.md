@@ -1,5 +1,19 @@
 # 技術スタック選定
 
+## 採用している技術スタック
+
+### コア技術構成
+- **フロントエンド**: React + TypeScript + Vite + Apollo Client
+- **バックエンド**: Node.js + Express + GraphQL + Apollo Server + TypeScript
+- **データベース**: SQLite（将来的にPostgreSQLへ移行予定）
+- **開発環境**: npm workspaces（モノレポ）+ ESLint + Prettier
+
+### 技術統合戦略
+- **GraphQL中心アーキテクチャ**: スキーマファーストによる型安全なAPI設計
+- **TypeScript統一**: フロントエンド・バックエンド全体での型安全性確保
+- **Apollo エコシステム**: GraphQLツールチェーンの統合活用
+- **段階的進化**: 初期開発から本格運用への技術移行容易性
+
 ## 実現すべきポイント
 
 ### 技術選択の基本戦略
@@ -151,3 +165,18 @@
 - **専門性分化**: フルスタック開発から専門分化への移行
 - **ツールチェーン**: 開発環境の統一と標準化の維持
 - **技術決定**: エコシステム統合を重視した継続的な技術選択
+
+## 関連ドキュメント
+
+### アーキテクチャ設計
+- [システム全体設計](./overview.md) - アーキテクチャ全体における技術選択の位置づけ
+- [モノレポ構造設計](./monorepo-structure.md) - モノレポ構成の詳細な設計思想
+- [データフロー・リアルタイム通信設計](./data-flow.md) - GraphQLとWebSocketの統合設計
+
+### 品質・運用要件
+- [コード品質管理](../qa/code-quality.md) - 開発ツール（ESLint/Prettier/TypeScript）の詳細設定
+- [スケーラビリティ設計](../requirements/non-functional/scalability.md) - 技術スタック進化戦略
+- [パフォーマンス要件](../requirements/non-functional/performance.md) - 技術選択のパフォーマンス影響
+
+### 機能要件
+- [リアルタイム更新機能要件](../requirements/functional/real-time-updates.md) - GraphQL Subscriptionsの要求仕様

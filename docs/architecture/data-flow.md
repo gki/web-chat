@@ -1,5 +1,18 @@
 # データフロー・リアルタイム通信設計
 
+## 採用しているデータフロー設計
+
+### 基本アーキテクチャ
+- **イベント駆動型アーキテクチャ**: PubSubパターンによるリアルタイムイベント配信
+- **GraphQL中心設計**: Query・Mutation・Subscriptionの統一的なデータ操作
+- **単方向データフロー**: クライアント→サーバー→クライアントの明確なフロー
+- **インメモリPubSub**: 単一サーバー環境での効率的なイベント配信
+
+### 通信プロトコル統合
+- **HTTP + WebSocket**: GraphQLによるREST・WebSocketの統一エンドポイント
+- **Apollo統合**: Apollo Server・Clientによるシームレスなリアルタイム通信
+- **型安全通信**: GraphQLスキーマによる構造化されたイベントデータ
+
 ## 実現すべきポイント
 
 ### データフローの基本要求
@@ -69,6 +82,17 @@
 - **必要性**: 問題発生時の原因特定・デバッグ
 - **対策**: 分散トレーシングシステムの導入
 
-スケーラビリティの詳細については[スケーラビリティ設計](../requirements/non-functional/scalability.md)を、
-パフォーマンス最適化については[パフォーマンス要件](../requirements/non-functional/performance.md)を、
-セキュリティ考慮事項については[セキュリティ要件](../requirements/non-functional/security.md)を参照。
+## 関連ドキュメント
+
+### アーキテクチャ設計
+- [システム全体設計](./overview.md) - データフローのアーキテクチャ全体における位置づけ
+- [技術スタック選定](./tech-stack.md) - GraphQL・WebSocket技術選択の背景
+
+### 非機能要件
+- [スケーラビリティ設計](../requirements/non-functional/scalability.md) - データフロー拡張戦略
+- [パフォーマンス要件](../requirements/non-functional/performance.md) - データフロー最適化方針
+- [セキュリティ要件](../requirements/non-functional/security.md) - リアルタイム通信のセキュリティ考慮
+
+### 機能・技術仕様
+- [リアルタイム更新機能要件](../requirements/functional/real-time-updates.md) - リアルタイム通信の具体的要求事項
+- [状態管理（Apollo Client）](../frontend/state-management.md) - クライアント側データフロー管理
